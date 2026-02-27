@@ -26,7 +26,7 @@ export function LanguageSwitcher() {
 
   return (
     <Select value={locale} onValueChange={handleChange}>
-      <SelectTrigger className="w-[80px] h-8 text-xs">
+      <SelectTrigger className="w-auto h-8 text-xs gap-0.5 px-2">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

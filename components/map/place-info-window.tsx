@@ -38,7 +38,7 @@ export function PlaceInfoWindow({
       <h3 className="text-sm font-semibold leading-tight">{place.name}</h3>
 
       {/* Address */}
-      <p className="text-[11px] text-gray-600 leading-snug">{displayAddress}</p>
+      <p className="text-[11px] text-gray-600 leading-snug underline">{displayAddress}</p>
 
       {/* Multiple locations note */}
       {place.addresses && place.addresses.length > 1 && (

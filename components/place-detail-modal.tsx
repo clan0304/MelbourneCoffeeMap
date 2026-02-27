@@ -57,7 +57,7 @@ export function PlaceDetailModal({
         <div className="flex flex-col gap-1.5 p-3 sm:gap-3 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-sm sm:text-lg">{place.name}</DialogTitle>
-            <DialogDescription className="text-[10px] sm:text-sm">{primaryAddress}</DialogDescription>
+            <DialogDescription className="text-[10px] sm:text-sm underline">{primaryAddress}</DialogDescription>
           </DialogHeader>
 
           {/* Category */}
