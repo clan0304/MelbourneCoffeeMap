@@ -89,7 +89,7 @@ export function PlaceDetailModal({
 
           {/* Coffee by */}
           {place.coffee_by && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm font-semibold text-muted-foreground">
               {t("coffeeBy", { roaster: place.coffee_by })}
             </p>
           )}
