@@ -185,7 +185,7 @@ function PlaceMarker({
       />
 
       {isActive && marker && (
-        <InfoWindow anchor={marker} onClose={onClose} maxWidth={320}>
+        <InfoWindow anchor={marker} onClose={onClose} maxWidth={280}>
           <PlaceInfoWindow
             place={markerData.place}
             markerAddress={markerData.address}
