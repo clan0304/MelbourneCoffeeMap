@@ -17,18 +17,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SUGGESTED_TAGS, COFFEE_ROASTERS } from "@/lib/constants";
+import { SUGGESTED_TAGS, COFFEE_ROASTERS, CITIES, CITY_LABELS, type City } from "@/lib/constants";
 import type { Place } from "@/types/database";
 
 type SearchFilterBarProps = {
   places: Place[];
   onFilter: (filtered: Place[]) => void;
+  city?: City;
+  onCityChange?: (city: City) => void;
   className?: string;
 };
 
 export function SearchFilterBar({
   places,
   onFilter,
+  city,
+  onCityChange,
   className = "",
 }: SearchFilterBarProps) {
   const t = useTranslations("Search");
@@ -41,13 +45,18 @@ export function SearchFilterBar({
   const filterPlaces = useCallback(() => {
     let filtered = places;
 
-    // Search by name + address
+    // Filter by city (only when city prop is provided)
+    if (city) {
+      filtered = filtered.filter((p) => p.city === city);
+    }
+
+    // Search by name + any address
     if (query.trim()) {
       const q = query.toLowerCase();
       filtered = filtered.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
-          p.address.toLowerCase().includes(q)
+          p.addresses?.some((a) => a.address.toLowerCase().includes(q))
       );
     }
 
@@ -69,7 +78,7 @@ export function SearchFilterBar({
     }
 
     onFilter(filtered);
-  }, [places, query, selectedTags, coffeeBy, category, onFilter]);
+  }, [places, query, selectedTags, coffeeBy, category, city, onFilter]);
 
   useEffect(() => {
     filterPlaces();
@@ -122,6 +131,22 @@ export function SearchFilterBar({
 
       {/* Dropdowns row */}
       <div className="flex flex-wrap items-center gap-2">
+        {/* City (only shown when props provided) */}
+        {city && onCityChange && (
+          <Select value={city} onValueChange={(v) => onCityChange(v as City)}>
+            <SelectTrigger className="w-[140px] h-8 text-xs">
+              <SelectValue placeholder={t("city")} />
+            </SelectTrigger>
+            <SelectContent>
+              {CITIES.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {CITY_LABELS[c]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
         {/* Tags multi-select dropdown */}
         <Popover>
           <PopoverTrigger asChild>

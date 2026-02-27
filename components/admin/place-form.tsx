@@ -16,12 +16,18 @@ import {
 } from "@/components/ui/select";
 import { AddressAutocomplete } from "./address-autocomplete";
 import { createPlace, updatePlace } from "@/actions/places";
-import { COFFEE_ROASTERS, SUGGESTED_TAGS } from "@/lib/constants";
-import type { Place } from "@/types/database";
+import { COFFEE_ROASTERS, SUGGESTED_TAGS, CITIES, CITY_LABELS, type City } from "@/lib/constants";
+import type { Place, PlaceAddress } from "@/types/database";
 
 type PlaceFormProps = {
   place?: Place;
 };
+
+const emptyAddress = (): PlaceAddress => ({
+  address: "",
+  latitude: 0,
+  longitude: 0,
+});
 
 export function PlaceForm({ place }: PlaceFormProps) {
   const t = useTranslations("PlaceForm");
@@ -30,11 +36,10 @@ export function PlaceForm({ place }: PlaceFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [coords, setCoords] = useState({
-    latitude: place?.latitude?.toString() ?? "",
-    longitude: place?.longitude?.toString() ?? "",
-  });
-  const [address, setAddress] = useState(place?.address ?? "");
+  const [addresses, setAddresses] = useState<PlaceAddress[]>(
+    place?.addresses?.length ? place.addresses : [emptyAddress()]
+  );
+  const [city, setCity] = useState<City>((place?.city as City) ?? "melbourne");
   const [category, setCategory] = useState(place?.category ?? "cafe");
   const [coffeeBy, setCoffeeBy] = useState(place?.coffee_by ?? "none");
   const [tags, setTags] = useState<string[]>(place?.tags ?? []);
@@ -43,15 +48,24 @@ export function PlaceForm({ place }: PlaceFormProps) {
   );
 
   const handlePlaceSelect = useCallback(
-    (selected: { address: string; latitude: number; longitude: number }) => {
-      setAddress(selected.address);
-      setCoords({
-        latitude: selected.latitude.toString(),
-        longitude: selected.longitude.toString(),
+    (index: number, selected: { address: string; latitude: number; longitude: number }) => {
+      setAddresses((prev) => {
+        const next = [...prev];
+        next[index] = selected;
+        return next;
       });
     },
     []
   );
+
+  const addAddress = () => {
+    setAddresses((prev) => [...prev, emptyAddress()]);
+  };
+
+  const removeAddress = (index: number) => {
+    if (addresses.length <= 1) return;
+    setAddresses((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const toggleTag = (tag: string) => {
     setTags((prev) =>
@@ -72,10 +86,18 @@ export function PlaceForm({ place }: PlaceFormProps) {
     setError(null);
     setLoading(true);
 
+    const validAddresses = addresses.filter(
+      (a) => a.address && a.latitude && a.longitude
+    );
+    if (validAddresses.length === 0) {
+      setError("nameAddressRequired");
+      setLoading(false);
+      return;
+    }
+
     const formData = new FormData(e.currentTarget);
-    formData.set("address", address);
-    formData.set("latitude", coords.latitude);
-    formData.set("longitude", coords.longitude);
+    formData.set("addresses", JSON.stringify(validAddresses));
+    formData.set("city", city);
     formData.set("category", category);
     formData.set("coffee_by", coffeeBy === "none" ? "" : coffeeBy);
     formData.set("tags", tags.join(","));
@@ -119,18 +141,67 @@ export function PlaceForm({ place }: PlaceFormProps) {
         />
       </div>
 
-      {/* Address (Google Places Autocomplete) */}
+      {/* City */}
       <div className="space-y-2">
+        <Label>{t("city")}</Label>
+        <Select value={city} onValueChange={(v) => setCity(v as City)}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {CITIES.map((c) => (
+              <SelectItem key={c} value={c}>
+                {CITY_LABELS[c]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Addresses (multiple) */}
+      <div className="space-y-3">
         <Label>{t("address")} *</Label>
-        <AddressAutocomplete
-          defaultValue={place?.address}
-          onPlaceSelect={handlePlaceSelect}
-        />
-        {coords.latitude && coords.longitude && (
-          <p className="text-xs text-muted-foreground">
-            {t("coordinates", { lat: coords.latitude, lng: coords.longitude })}
-          </p>
-        )}
+        {addresses.map((addr, index) => (
+          <div key={index} className="space-y-1 rounded-md border p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-muted-foreground">
+                {t("location", { n: index + 1 })}
+              </span>
+              {addresses.length > 1 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs text-destructive hover:text-destructive"
+                  onClick={() => removeAddress(index)}
+                >
+                  {t("removeLocation")}
+                </Button>
+              )}
+            </div>
+            <AddressAutocomplete
+              defaultValue={addr.address}
+              onPlaceSelect={(selected) => handlePlaceSelect(index, selected)}
+            />
+            {addr.latitude !== 0 && addr.longitude !== 0 && (
+              <p className="text-xs text-muted-foreground">
+                {t("coordinates", {
+                  lat: addr.latitude.toString(),
+                  lng: addr.longitude.toString(),
+                })}
+              </p>
+            )}
+          </div>
+        ))}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={addAddress}
+          className="text-xs"
+        >
+          {t("addLocation")}
+        </Button>
       </div>
 
       {/* Category */}
@@ -266,9 +337,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
       </div>
 
       {/* Hidden fields */}
-      <input type="hidden" name="address" value={address} />
-      <input type="hidden" name="latitude" value={coords.latitude} />
-      <input type="hidden" name="longitude" value={coords.longitude} />
+      <input type="hidden" name="city" value={city} />
       <input type="hidden" name="category" value={category} />
       <input type="hidden" name="coffee_by" value={coffeeBy === "none" ? "" : coffeeBy} />
       <input type="hidden" name="tags" value={tags.join(",")} />

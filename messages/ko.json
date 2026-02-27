@@ -19,7 +19,9 @@
     "reels": "Reels",
     "tiktok": "TikTok",
     "viewOnMap": "지도에서 보기",
-    "coffeeBy": "원두: {roaster}"
+    "coffeeBy": "원두: {roaster}",
+    "allLocations": "전체 지점",
+    "plusLocations": "+{count}개 지점"
   },
   "Admin": {
     "title": "관리자",
@@ -29,6 +31,7 @@
     "noPlaces": "아직 장소가 없습니다. 첫 번째 장소를 추가하세요!",
     "image": "이미지",
     "name": "이름",
+    "city": "도시",
     "category": "카테고리",
     "address": "주소",
     "tags": "태그",
@@ -45,6 +48,7 @@
     "title": "장소 수정"
   },
   "PlaceForm": {
+    "city": "도시",
     "name": "이름",
     "namePlaceholder": "카페 이름",
     "address": "주소",
@@ -67,6 +71,9 @@
     "noteKo": "메모 (한국어)",
     "notePlaceholderEn": "이 장소에 대한 영문 메모...",
     "notePlaceholderKo": "이 장소에 대한 메모...",
+    "addLocation": "+ 지점 추가",
+    "removeLocation": "삭제",
+    "location": "지점 {n}",
     "saving": "저장 중...",
     "update": "수정",
     "create": "등록",
@@ -74,6 +81,7 @@
   },
   "Search": {
     "placeholder": "카페 검색...",
+    "city": "도시",
     "tags": "태그",
     "coffeeBy": "원두",
     "category": "카테고리",

@@ -11,10 +11,17 @@ function buildGoogleMapsUrl(name: string, address: string) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + address)}`;
 }
 
-export function PlaceInfoWindow({ place }: { place: Place }) {
+export function PlaceInfoWindow({
+  place,
+  markerAddress,
+}: {
+  place: Place;
+  markerAddress?: string;
+}) {
   const t = useTranslations("PlaceDetail");
   const locale = useLocale();
   const note = locale === "ko" ? (place.note_ko || place.note_en) : place.note_en;
+  const displayAddress = markerAddress ?? place.addresses?.[0]?.address ?? "";
 
   return (
     <div className="flex flex-col gap-2 p-1 max-w-[280px] font-sans">
@@ -31,11 +38,18 @@ export function PlaceInfoWindow({ place }: { place: Place }) {
       <h3 className="text-base font-semibold leading-tight">{place.name}</h3>
 
       {/* Address */}
-      <p className="text-xs text-gray-500 leading-snug">{place.address}</p>
+      <p className="text-xs text-gray-600 leading-snug">{displayAddress}</p>
+
+      {/* Multiple locations note */}
+      {place.addresses && place.addresses.length > 1 && (
+        <p className="text-[11px] text-gray-600">
+          {t("plusLocations", { count: place.addresses.length - 1 })}
+        </p>
+      )}
 
       {/* Coffee by */}
       {place.coffee_by && (
-        <p className="text-xs text-gray-500">
+        <p className="text-xs font-semibold text-gray-600">
           {t("coffeeBy", { roaster: place.coffee_by })}
         </p>
       )}
@@ -64,18 +78,18 @@ export function PlaceInfoWindow({ place }: { place: Place }) {
       {/* Link buttons */}
       <div className="flex gap-2 pt-1">
         <a
-          href={buildGoogleSearchUrl(place.name, place.address)}
+          href={buildGoogleSearchUrl(place.name, displayAddress)}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 rounded-md bg-gray-100 px-2 py-1.5 text-center text-[11px] font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+          className="flex-1 rounded-md bg-gray-800 px-2 py-1.5 text-center text-[11px] font-medium text-white hover:bg-gray-700 transition-colors"
         >
           {t("google")}
         </a>
         <a
-          href={buildGoogleMapsUrl(place.name, place.address)}
+          href={buildGoogleMapsUrl(place.name, displayAddress)}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 rounded-md bg-gray-100 px-2 py-1.5 text-center text-[11px] font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+          className="flex-1 rounded-md bg-gray-800 px-2 py-1.5 text-center text-[11px] font-medium text-white hover:bg-gray-700 transition-colors"
         >
           {t("maps")}
         </a>
@@ -84,7 +98,7 @@ export function PlaceInfoWindow({ place }: { place: Place }) {
             href={place.instagram_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 rounded-md bg-gray-100 px-2 py-1.5 text-center text-[11px] font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+            className="flex-1 rounded-md bg-gray-800 px-2 py-1.5 text-center text-[11px] font-medium text-white hover:bg-gray-700 transition-colors"
           >
             {t("instagram")}
           </a>
@@ -94,7 +108,7 @@ export function PlaceInfoWindow({ place }: { place: Place }) {
             href={place.reels_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 rounded-md bg-gray-100 px-2 py-1.5 text-center text-[11px] font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+            className="flex-1 rounded-md bg-gray-800 px-2 py-1.5 text-center text-[11px] font-medium text-white hover:bg-gray-700 transition-colors"
           >
             {t("reels")}
           </a>
@@ -104,7 +118,7 @@ export function PlaceInfoWindow({ place }: { place: Place }) {
             href={place.tiktok_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 rounded-md bg-gray-100 px-2 py-1.5 text-center text-[11px] font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+            className="flex-1 rounded-md bg-gray-800 px-2 py-1.5 text-center text-[11px] font-medium text-white hover:bg-gray-700 transition-colors"
           >
             {t("tiktok")}
           </a>

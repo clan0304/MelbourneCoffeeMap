@@ -36,6 +36,7 @@ export function PlaceDetailModal({
   if (!place) return null;
 
   const note = locale === "ko" ? (place.note_ko || place.note_en) : place.note_en;
+  const primaryAddress = place.addresses?.[0]?.address;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -56,13 +57,35 @@ export function PlaceDetailModal({
         <div className="flex flex-col gap-3 p-6">
           <DialogHeader>
             <DialogTitle>{place.name}</DialogTitle>
-            <DialogDescription>{place.address}</DialogDescription>
+            <DialogDescription>{primaryAddress}</DialogDescription>
           </DialogHeader>
 
           {/* Category */}
           <Badge variant="outline" className="w-fit capitalize">
             {place.category}
           </Badge>
+
+          {/* All addresses */}
+          {place.addresses && place.addresses.length > 1 && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                {t("allLocations")}
+              </p>
+              {place.addresses.map((addr, i) => (
+                <div key={i} className="flex items-center gap-2 text-sm">
+                  <span className="shrink-0 text-muted-foreground">{i + 1}.</span>
+                  <a
+                    href={buildGoogleMapsUrl(place.name, addr.address)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline truncate"
+                  >
+                    {addr.address}
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Coffee by */}
           {place.coffee_by && (
@@ -92,18 +115,18 @@ export function PlaceDetailModal({
           {/* Links */}
           <div className="flex gap-2 pt-2">
             <a
-              href={buildGoogleSearchUrl(place.name, place.address)}
+              href={buildGoogleSearchUrl(place.name, primaryAddress ?? "")}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 rounded-md bg-secondary px-3 py-2 text-center text-xs font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors"
+              className="flex-1 rounded-md bg-primary px-3 py-2 text-center text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
             >
               {t("google")}
             </a>
             <a
-              href={buildGoogleMapsUrl(place.name, place.address)}
+              href={buildGoogleMapsUrl(place.name, primaryAddress ?? "")}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 rounded-md bg-secondary px-3 py-2 text-center text-xs font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors"
+              className="flex-1 rounded-md bg-primary px-3 py-2 text-center text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
             >
               {t("maps")}
             </a>
@@ -112,7 +135,7 @@ export function PlaceDetailModal({
                 href={place.instagram_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 rounded-md bg-secondary px-3 py-2 text-center text-xs font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                className="flex-1 rounded-md bg-primary px-3 py-2 text-center text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 {t("instagram")}
               </a>
@@ -122,7 +145,7 @@ export function PlaceDetailModal({
                 href={place.reels_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 rounded-md bg-secondary px-3 py-2 text-center text-xs font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                className="flex-1 rounded-md bg-primary px-3 py-2 text-center text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 {t("reels")}
               </a>
@@ -132,7 +155,7 @@ export function PlaceDetailModal({
                 href={place.tiktok_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 rounded-md bg-secondary px-3 py-2 text-center text-xs font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                className="flex-1 rounded-md bg-primary px-3 py-2 text-center text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 {t("tiktok")}
               </a>

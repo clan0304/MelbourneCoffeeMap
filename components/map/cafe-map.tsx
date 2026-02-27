@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   APIProvider,
@@ -14,8 +14,15 @@ import { createClient } from "@/lib/supabase/client";
 import type { Place } from "@/types/database";
 import { PlaceInfoWindow } from "./place-info-window";
 import { SearchFilterBar } from "@/components/search-filter-bar";
+import { CITY_CENTERS } from "@/lib/constants";
 
-const MELBOURNE_CENTER = { lat: -37.8136, lng: 144.9631 };
+type MarkerData = {
+  place: Place;
+  address: string;
+  lat: number;
+  lng: number;
+  markerId: string; // placeId-addressIndex
+};
 
 export function CafeMap() {
   const searchParams = useSearchParams();
@@ -23,10 +30,10 @@ export function CafeMap() {
 
   const [places, setPlaces] = useState<Place[]>([]);
   const [filteredPlaces, setFilteredPlaces] = useState<Place[]>([]);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [pinnedId, setPinnedId] = useState<string | null>(null);
+  const [pinnedMarkerId, setPinnedMarkerId] = useState<string | null>(null);
   const [isLocalhost, setIsLocalhost] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setIsLocalhost(window.location.hostname === "localhost");
@@ -40,9 +47,10 @@ export function CafeMap() {
         if (data) {
           setPlaces(data);
           if (focusId && data.some((p) => p.id === focusId)) {
-            setPinnedId(focusId);
+            setPinnedMarkerId(`${focusId}-0`);
           }
         }
+        setLoading(false);
       });
   }, [focusId]);
 
@@ -50,34 +58,61 @@ export function CafeMap() {
     setFilteredPlaces(filtered);
   }, []);
 
-  const activeId = pinnedId ?? hoveredId;
+  // Flatten places into individual markers
+  const markers: MarkerData[] = useMemo(() => {
+    return filteredPlaces.flatMap((place) =>
+      (place.addresses ?? []).map((addr, i) => ({
+        place,
+        address: addr.address,
+        lat: addr.latitude,
+        lng: addr.longitude,
+        markerId: `${place.id}-${i}`,
+      }))
+    );
+  }, [filteredPlaces]);
+
   const focusedPlace = focusId ? places.find((p) => p.id === focusId) : null;
-  const mapCenter = focusedPlace
-    ? { lat: focusedPlace.latitude, lng: focusedPlace.longitude }
-    : MELBOURNE_CENTER;
+  const mapCenter = focusedPlace?.addresses?.[0]
+    ? { lat: focusedPlace.addresses[0].latitude, lng: focusedPlace.addresses[0].longitude }
+    : CITY_CENTERS.melbourne;
+
+  if (loading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-background">
+        <svg
+          className="h-10 w-10 animate-spin text-muted-foreground"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+      </div>
+    );
+  }
 
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
       <Map
+        key={focusedPlace ? `focus-${focusId}` : "default"}
         defaultCenter={mapCenter}
         defaultZoom={focusedPlace ? 16 : 13}
         mapId="melbourne-cafe-map"
         className="h-full w-full"
         gestureHandling="greedy"
         disableDefaultUI={false}
-        onClick={() => setPinnedId(null)}
+        onClick={() => setPinnedMarkerId(null)}
       >
-        {filteredPlaces.map((place) => (
+        {markers.map((m) => (
           <PlaceMarker
-            key={place.id}
-            place={place}
-            isActive={place.id === activeId}
-            onHover={() => setHoveredId(place.id)}
-            onHoverEnd={() => setHoveredId(null)}
+            key={m.markerId}
+            markerData={m}
+            isActive={m.markerId === pinnedMarkerId}
             onClick={() =>
-              setPinnedId((prev) => (prev === place.id ? null : place.id))
+              setPinnedMarkerId((prev) => (prev === m.markerId ? null : m.markerId))
             }
-            onClose={() => setPinnedId(null)}
+            onClose={() => setPinnedMarkerId(null)}
           />
         ))}
       </Map>
@@ -104,14 +139,12 @@ export function CafeMap() {
         </svg>
       </button>
 
-      {/* Search & Filter overlay */}
-      {filterOpen && (
-        <div className="absolute top-26 left-4 right-4 sm:right-auto sm:w-[380px] z-10">
-          <div className="rounded-lg border bg-background/90 backdrop-blur-sm p-3 shadow-lg">
-            <SearchFilterBar places={places} onFilter={handleFilter} />
-          </div>
+      {/* Search & Filter overlay (always mounted so filter runs) */}
+      <div className={`absolute top-26 left-4 right-4 sm:right-auto sm:w-[380px] z-10 ${filterOpen ? "" : "hidden"}`}>
+        <div className="rounded-lg border bg-background/90 backdrop-blur-sm p-3 shadow-lg">
+          <SearchFilterBar places={places} onFilter={handleFilter} />
         </div>
-      )}
+      </div>
 
       {isLocalhost && (
         <Link
@@ -126,17 +159,13 @@ export function CafeMap() {
 }
 
 function PlaceMarker({
-  place,
+  markerData,
   isActive,
-  onHover,
-  onHoverEnd,
   onClick,
   onClose,
 }: {
-  place: Place;
+  markerData: MarkerData;
   isActive: boolean;
-  onHover: () => void;
-  onHoverEnd: () => void;
   onClick: () => void;
   onClose: () => void;
 }) {
@@ -150,16 +179,17 @@ function PlaceMarker({
     <>
       <AdvancedMarker
         ref={markerRef}
-        position={{ lat: place.latitude, lng: place.longitude }}
+        position={{ lat: markerData.lat, lng: markerData.lng }}
         onClick={handleClick}
-        onMouseEnter={onHover}
-        onMouseLeave={onHoverEnd}
-        title={place.name}
+        title={markerData.place.name}
       />
 
       {isActive && marker && (
         <InfoWindow anchor={marker} onClose={onClose} maxWidth={320}>
-          <PlaceInfoWindow place={place} />
+          <PlaceInfoWindow
+            place={markerData.place}
+            markerAddress={markerData.address}
+          />
         </InfoWindow>
       )}
     </>

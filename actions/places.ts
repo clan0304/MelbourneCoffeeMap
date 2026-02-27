@@ -2,7 +2,29 @@
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
-import type { Place } from "@/types/database";
+import type { Place, PlaceAddress } from "@/types/database";
+
+function parseAddresses(raw: string): PlaceAddress[] | null {
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) return null;
+    for (const addr of parsed) {
+      if (
+        typeof addr.address !== "string" ||
+        !addr.address ||
+        typeof addr.latitude !== "number" ||
+        isNaN(addr.latitude) ||
+        typeof addr.longitude !== "number" ||
+        isNaN(addr.longitude)
+      ) {
+        return null;
+      }
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
 
 export async function getPlaces(): Promise<Place[]> {
   const supabase = createAdminClient();
@@ -31,9 +53,9 @@ export async function createPlace(formData: FormData): Promise<{ error?: string 
   const supabase = createAdminClient();
 
   const name = formData.get("name") as string;
-  const address = formData.get("address") as string;
-  const latitude = parseFloat(formData.get("latitude") as string);
-  const longitude = parseFloat(formData.get("longitude") as string);
+  const addressesRaw = formData.get("addresses") as string;
+  const addresses = parseAddresses(addressesRaw);
+  const city = (formData.get("city") as string) || "melbourne";
   const category = (formData.get("category") as string) || "cafe";
   const instagram_url = (formData.get("instagram_url") as string) || null;
   const reels_url = (formData.get("reels_url") as string) || null;
@@ -44,7 +66,7 @@ export async function createPlace(formData: FormData): Promise<{ error?: string 
   const note_en = (formData.get("note_en") as string) || null;
   const note_ko = (formData.get("note_ko") as string) || null;
 
-  if (!name || !address || isNaN(latitude) || isNaN(longitude)) {
+  if (!name || !addresses) {
     return { error: "nameAddressRequired" };
   }
 
@@ -70,9 +92,8 @@ export async function createPlace(formData: FormData): Promise<{ error?: string 
 
   const { error } = await supabase.from("places").insert({
     name,
-    address,
-    latitude,
-    longitude,
+    addresses,
+    city,
     category,
     instagram_url,
     reels_url,
@@ -95,9 +116,9 @@ export async function updatePlace(id: string, formData: FormData): Promise<{ err
   const supabase = createAdminClient();
 
   const name = formData.get("name") as string;
-  const address = formData.get("address") as string;
-  const latitude = parseFloat(formData.get("latitude") as string);
-  const longitude = parseFloat(formData.get("longitude") as string);
+  const addressesRaw = formData.get("addresses") as string;
+  const addresses = parseAddresses(addressesRaw);
+  const city = (formData.get("city") as string) || "melbourne";
   const category = (formData.get("category") as string) || "cafe";
   const instagram_url = (formData.get("instagram_url") as string) || null;
   const reels_url = (formData.get("reels_url") as string) || null;
@@ -108,7 +129,7 @@ export async function updatePlace(id: string, formData: FormData): Promise<{ err
   const note_en = (formData.get("note_en") as string) || null;
   const note_ko = (formData.get("note_ko") as string) || null;
 
-  if (!name || !address || isNaN(latitude) || isNaN(longitude)) {
+  if (!name || !addresses) {
     return { error: "nameAddressRequired" };
   }
 
@@ -134,9 +155,8 @@ export async function updatePlace(id: string, formData: FormData): Promise<{ err
 
   const updateData: Record<string, unknown> = {
     name,
-    address,
-    latitude,
-    longitude,
+    addresses,
+    city,
     category,
     instagram_url,
     reels_url,

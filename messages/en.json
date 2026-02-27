@@ -19,7 +19,9 @@
     "reels": "Reels",
     "tiktok": "TikTok",
     "viewOnMap": "View on Map",
-    "coffeeBy": "Coffee by {roaster}"
+    "coffeeBy": "Coffee by {roaster}",
+    "allLocations": "All locations",
+    "plusLocations": "+{count} more"
   },
   "Admin": {
     "title": "Admin",
@@ -29,6 +31,7 @@
     "noPlaces": "No places yet. Add your first one!",
     "image": "Image",
     "name": "Name",
+    "city": "City",
     "category": "Category",
     "address": "Address",
     "tags": "Tags",
@@ -45,6 +48,7 @@
     "title": "Edit Place"
   },
   "PlaceForm": {
+    "city": "City",
     "name": "Name",
     "namePlaceholder": "Cafe name",
     "address": "Address",
@@ -67,6 +71,9 @@
     "noteKo": "Note (Korean)",
     "notePlaceholderEn": "Personal notes about this place...",
     "notePlaceholderKo": "이 장소에 대한 메모...",
+    "addLocation": "+ Add Location",
+    "removeLocation": "Remove",
+    "location": "Location {n}",
     "saving": "Saving...",
     "update": "Update",
     "create": "Create",
@@ -74,6 +81,7 @@
   },
   "Search": {
     "placeholder": "Search cafes...",
+    "city": "City",
     "tags": "Tags",
     "coffeeBy": "Coffee by",
     "category": "Category",

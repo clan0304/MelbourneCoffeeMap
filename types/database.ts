@@ -1,10 +1,15 @@
-export type Place = {
-  id: string;
-  category: string;
-  name: string;
+export type PlaceAddress = {
   address: string;
   latitude: number;
   longitude: number;
+};
+
+export type Place = {
+  id: string;
+  category: string;
+  city: string;
+  name: string;
+  addresses: PlaceAddress[];
   image_url: string | null;
   instagram_url: string | null;
   reels_url: string | null;

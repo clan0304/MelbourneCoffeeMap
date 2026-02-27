@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { DeleteButton } from "@/components/admin/delete-button";
+import { CITY_LABELS, type City } from "@/lib/constants";
 
 export default async function AdminPage() {
   const t = await getTranslations("Admin");
@@ -35,6 +36,7 @@ export default async function AdminPage() {
               <TableRow>
                 <TableHead className="w-16">{t("image")}</TableHead>
                 <TableHead>{t("name")}</TableHead>
+                <TableHead>{t("city")}</TableHead>
                 <TableHead>{t("category")}</TableHead>
                 <TableHead className="hidden md:table-cell">{t("address")}</TableHead>
                 <TableHead className="hidden lg:table-cell">{t("tags")}</TableHead>
@@ -57,10 +59,16 @@ export default async function AdminPage() {
                   </TableCell>
                   <TableCell className="font-medium">{place.name}</TableCell>
                   <TableCell>
+                    <Badge variant="outline">{CITY_LABELS[place.city as City] ?? place.city}</Badge>
+                  </TableCell>
+                  <TableCell>
                     <Badge variant="secondary">{place.category}</Badge>
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-sm text-muted-foreground max-w-[200px] truncate">
-                    {place.address}
+                    {place.addresses?.[0]?.address}
+                    {place.addresses && place.addresses.length > 1 && (
+                      <span className="ml-1 text-xs">+{place.addresses.length - 1}</span>
+                    )}
                   </TableCell>
                   <TableCell className="hidden lg:table-cell">
                     <div className="flex flex-wrap gap-1">

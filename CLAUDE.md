@@ -17,6 +17,7 @@
 - **No auth** — Public read, admin writes via `service_role` key
 - **Admin pages** (`/admin/*`) — localhost에서만 접근 가능 (서버사이드 host 체크)
 - **Supabase RLS**: SELECT은 `is_public = true`로 누구나, INSERT/UPDATE/DELETE는 service_role만
+- **Multiple addresses**: 한 place가 여러 지점(주소)을 가질 수 있음 (`addresses` JSONB array)
 - **Google/Instagram 링크**: DB에 저장 안 함, `name + address`로 프론트에서 동적 생성
 - **next/image**: `next.config.ts`에 `**.supabase.co` remotePatterns 설정됨
 
@@ -32,14 +33,15 @@
 ## Key Components
 ```
 components/
-├── place-card.tsx              → 카드 컴포넌트 (이미지, 이름, 주소, 태그 badges)
-├── place-detail-modal.tsx      → 상세 모달 (shadcn Dialog, 사진, 정보, 링크 버튼, View on Map)
+├── place-card.tsx              → 카드 컴포넌트 (이미지, 이름, 대표주소, +N locations 뱃지)
+├── place-detail-modal.tsx      → 상세 모달 (사진, 전체 주소 리스트, 링크 버튼, View on Map)
+├── search-filter-bar.tsx       → 검색 + 필터 (도시, 태그, 원두, 카테고리) — 모든 주소 검색
 ├── map/
-│   ├── cafe-map.tsx            → 전체화면 지도 (APIProvider + Map + Markers)
-│   └── place-info-window.tsx   → 지도 InfoWindow 팝업
+│   ├── cafe-map.tsx            → 전체화면 지도 (place당 addresses 수만큼 마커 생성)
+│   └── place-info-window.tsx   → 지도 InfoWindow 팝업 (마커별 주소 표시)
 └── admin/
     ├── address-autocomplete.tsx → Google Places Autocomplete (APIProvider + useMapsLibrary 래핑)
-    └── place-form.tsx           → 카페 등록/수정 폼
+    └── place-form.tsx           → 카페 등록/수정 폼 (복수 주소 입력 UI)
 ```
 
 ## Database: `places` Table
@@ -47,15 +49,24 @@ components/
 |--------|------|------|
 | id | UUID | PK, auto-generated |
 | category | TEXT | 'cafe' (default), 'restaurant' 등 |
+| city | TEXT | 'melbourne' (default), 'sydney', 'brisbane' |
 | name | TEXT | 필수 |
-| address | TEXT | 필수 |
-| latitude | DOUBLE | Google Places에서 자동 추출 |
-| longitude | DOUBLE | Google Places에서 자동 추출 |
+| addresses | JSONB | `[{address, latitude, longitude}, ...]` — 복수 지점 지원 |
 | image_url | TEXT | Supabase Storage public URL |
 | instagram_url | TEXT | 선택 |
+| reels_url | TEXT | 선택 |
+| tiktok_url | TEXT | 선택 |
+| coffee_by | TEXT | 로스터 이름 (선택) |
 | tags | TEXT[] | e.g. ['cozy', 'filter-coffee', 'wifi'] |
-| note | TEXT | 개인 메모 |
+| note_en | TEXT | 영문 메모 |
+| note_ko | TEXT | 한국어 메모 |
 | is_public | BOOLEAN | default true |
+
+### `addresses` JSONB 구조
+```typescript
+type PlaceAddress = { address: string; latitude: number; longitude: number };
+// addresses: PlaceAddress[] — 최소 1개 필수, addresses[0]이 대표 주소
+```
 
 ## Supabase Clients
 - `lib/supabase/client.ts` — 브라우저 (anon key, public read)
@@ -76,6 +87,9 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY    # Maps JS API + Places API 활성화 필요
 - 이미지는 Supabase Storage `places` 버킷 (public)에 업로드
 - Google Places Autocomplete는 Admin 주소 입력에서만 사용 (API 호출 최소화)
 - `address-autocomplete.tsx`는 자체 `APIProvider`로 래핑 — `useMapsLibrary("places")`로 API 로드 대기
+- 복수 주소: `place-form.tsx`에서 `AddressAutocomplete`를 주소 개수만큼 렌더, JSON.stringify로 전송
+- 지도 마커: `cafe-map.tsx`에서 `places.flatMap(addresses)` → 개별 `MarkerData`로 변환
+- 검색: `search-filter-bar.tsx`에서 `p.addresses.some(a => a.address.includes(q))`로 모든 주소 검색
 - 데이터 수십 개 규모 — 페이지네이션/서버사이드 필터 불필요
 
 ---

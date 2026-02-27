@@ -21,6 +21,7 @@ export const COFFEE_ROASTERS = [
   "Five Senses",
   "Maker",
   "Code Black",
+  "Bench Coffee",
 ];
 
 export const SUGGESTED_TAGS = [
@@ -35,7 +36,23 @@ export const SUGGESTED_TAGS = [
   "Photo Worthy",
   "Sandwich/Burger",
   "Special Drinks",
+  "Multiple Locations",
 ];
 
 export const CATEGORIES = ["cafe", "restaurant"] as const;
 export type Category = (typeof CATEGORIES)[number];
+
+export const CITIES = ["melbourne", "sydney", "brisbane"] as const;
+export type City = (typeof CITIES)[number];
+
+export const CITY_CENTERS: Record<City, { lat: number; lng: number }> = {
+  melbourne: { lat: -37.8136, lng: 144.9631 },
+  sydney: { lat: -33.8688, lng: 151.2093 },
+  brisbane: { lat: -27.4698, lng: 153.0251 },
+};
+
+export const CITY_LABELS: Record<City, string> = {
+  melbourne: "Melbourne",
+  sydney: "Sydney",
+  brisbane: "Brisbane",
+};
