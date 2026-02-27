@@ -1,0 +1,90 @@
+{
+  "Metadata": {
+    "title": "Melbourne Cafe Map",
+    "description": "Discover the best cafes in Melbourne"
+  },
+  "Home": {
+    "title": "Melbourne Cafe Map",
+    "viewMap": "View Map",
+    "admin": "+ Admin",
+    "noCafes": "No cafes found."
+  },
+  "Map": {
+    "backToList": "Back to List"
+  },
+  "PlaceDetail": {
+    "google": "Google",
+    "maps": "Maps",
+    "instagram": "Instagram",
+    "reels": "Reels",
+    "tiktok": "TikTok",
+    "viewOnMap": "View on Map",
+    "coffeeBy": "Coffee by {roaster}"
+  },
+  "Admin": {
+    "title": "Admin",
+    "viewSite": "View Site",
+    "placesCount": "Admin - Places ({count})",
+    "addNew": "+ Add New Place",
+    "noPlaces": "No places yet. Add your first one!",
+    "image": "Image",
+    "name": "Name",
+    "category": "Category",
+    "address": "Address",
+    "tags": "Tags",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleting": "...",
+    "confirmDelete": "Are you sure you want to delete this place?"
+  },
+  "AdminNew": {
+    "title": "Add New Place"
+  },
+  "AdminEdit": {
+    "title": "Edit Place"
+  },
+  "PlaceForm": {
+    "name": "Name",
+    "namePlaceholder": "Cafe name",
+    "address": "Address",
+    "addressPlaceholder": "Search address...",
+    "coordinates": "Coordinates: {lat}, {lng}",
+    "category": "Category",
+    "categoryCafe": "Cafe",
+    "categoryRestaurant": "Restaurant",
+    "coffeeBy": "Coffee by",
+    "coffeeByPlaceholder": "Select roaster...",
+    "photo": "Photo",
+    "instagramUrl": "Instagram URL",
+    "instagramPlaceholder": "https://instagram.com/...",
+    "reelsUrl": "Reels URL",
+    "reelsPlaceholder": "https://instagram.com/reel/...",
+    "tiktokUrl": "TikTok URL",
+    "tiktokPlaceholder": "https://tiktok.com/...",
+    "tags": "Tags",
+    "noteEn": "Note (English)",
+    "noteKo": "Note (Korean)",
+    "notePlaceholderEn": "Personal notes about this place...",
+    "notePlaceholderKo": "이 장소에 대한 메모...",
+    "saving": "Saving...",
+    "update": "Update",
+    "create": "Create",
+    "cancel": "Cancel"
+  },
+  "Search": {
+    "placeholder": "Search cafes...",
+    "tags": "Tags",
+    "coffeeBy": "Coffee by",
+    "category": "Category",
+    "cafe": "Cafe",
+    "restaurant": "Restaurant",
+    "all": "All",
+    "clear": "Clear",
+    "noResults": "No results found."
+  },
+  "Errors": {
+    "nameAddressRequired": "Name, address, and valid coordinates are required.",
+    "imageUploadFailed": "Image upload failed."
+  }
+}

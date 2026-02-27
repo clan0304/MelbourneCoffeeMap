@@ -1,0 +1,90 @@
+{
+  "Metadata": {
+    "title": "멜버른 카페 지도",
+    "description": "멜버른 최고의 카페를 발견하세요"
+  },
+  "Home": {
+    "title": "멜버른 카페 지도",
+    "viewMap": "지도 보기",
+    "admin": "+ 관리자",
+    "noCafes": "등록된 카페가 없습니다."
+  },
+  "Map": {
+    "backToList": "목록으로"
+  },
+  "PlaceDetail": {
+    "google": "Google",
+    "maps": "지도",
+    "instagram": "Instagram",
+    "reels": "Reels",
+    "tiktok": "TikTok",
+    "viewOnMap": "지도에서 보기",
+    "coffeeBy": "원두: {roaster}"
+  },
+  "Admin": {
+    "title": "관리자",
+    "viewSite": "사이트 보기",
+    "placesCount": "관리자 - 장소 ({count})",
+    "addNew": "+ 새 장소 추가",
+    "noPlaces": "아직 장소가 없습니다. 첫 번째 장소를 추가하세요!",
+    "image": "이미지",
+    "name": "이름",
+    "category": "카테고리",
+    "address": "주소",
+    "tags": "태그",
+    "actions": "작업",
+    "edit": "수정",
+    "delete": "삭제",
+    "deleting": "...",
+    "confirmDelete": "이 장소를 삭제하시겠습니까?"
+  },
+  "AdminNew": {
+    "title": "새 장소 추가"
+  },
+  "AdminEdit": {
+    "title": "장소 수정"
+  },
+  "PlaceForm": {
+    "name": "이름",
+    "namePlaceholder": "카페 이름",
+    "address": "주소",
+    "addressPlaceholder": "주소 검색...",
+    "coordinates": "좌표: {lat}, {lng}",
+    "category": "카테고리",
+    "categoryCafe": "카페",
+    "categoryRestaurant": "레스토랑",
+    "coffeeBy": "원두",
+    "coffeeByPlaceholder": "로스터 선택...",
+    "photo": "사진",
+    "instagramUrl": "Instagram URL",
+    "instagramPlaceholder": "https://instagram.com/...",
+    "reelsUrl": "Reels URL",
+    "reelsPlaceholder": "https://instagram.com/reel/...",
+    "tiktokUrl": "TikTok URL",
+    "tiktokPlaceholder": "https://tiktok.com/...",
+    "tags": "태그",
+    "noteEn": "메모 (영어)",
+    "noteKo": "메모 (한국어)",
+    "notePlaceholderEn": "이 장소에 대한 영문 메모...",
+    "notePlaceholderKo": "이 장소에 대한 메모...",
+    "saving": "저장 중...",
+    "update": "수정",
+    "create": "등록",
+    "cancel": "취소"
+  },
+  "Search": {
+    "placeholder": "카페 검색...",
+    "tags": "태그",
+    "coffeeBy": "원두",
+    "category": "카테고리",
+    "cafe": "카페",
+    "restaurant": "레스토랑",
+    "all": "전체",
+    "clear": "초기화",
+    "noResults": "검색 결과가 없습니다."
+  },
+  "Errors": {
+    "nameAddressRequired": "이름, 주소, 유효한 좌표가 필요합니다.",
+    "imageUploadFailed": "이미지 업로드에 실패했습니다."
+  }
+}
